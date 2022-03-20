@@ -1,22 +1,34 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import './rewrite.js'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: Home
+    path: '*',
+    redirect: '/home'
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path: '/home',
+    component: () => import('@/views/Home/index.vue'),
+    meta: { show: true }
+  },
+  {
+    path: '/search/:keywords?', // 传递 params 参数，问号表示可传可不传
+    component: () => import('@/views/Search/index.vue'),
+    meta: { show: true },
+    name: 'search'
+  },
+  {
+    path: '/login',
+    component: () => import('@/views/Login/index.vue'),
+    meta: { show: false }
+  },
+  {
+    path: '/register',
+    component: () => import('@/views/Register/index.vue'),
+    meta: { show: false }
   }
 ]
 
