@@ -2,42 +2,47 @@
   <!-- 商品分类导航 -->
   <div class="type-nav">
     <div class="container">
-      <div @mouseleave="currentIndex = -1">
+      <div @mouseleave="notShow" @mouseenter="onShow">
         <h2 class="all">全部商品分类</h2>
-        <div class="sort">
-          <div class="all-sort-list2" @click="goSearch">
-            <div
-              class="item"
-              v-for="(c1, index) in categoryList"
-              :key="c1.categoryId"
-              :class="{ itemHover: currentIndex == index }"
-            >
-              <h3 @mouseenter="getCurrentIndex(index)">
-                <a :data-categoryname="c1.categoryName" :data-categoryid1="c1.categoryId">{{
-                  c1.categoryName
-                }}</a>
-              </h3>
-              <div class="item-list clearfix">
-                <div class="subitem" v-for="c2 in c1.categoryChild" :key="c2.categoryId">
-                  <dl class="fore">
-                    <dt>
-                      <a :data-categoryname="c2.categoryName" :data-categoryid2="c2.categoryId">{{
-                        c2.categoryName
-                      }}</a>
-                    </dt>
-                    <dd>
-                      <em v-for="c3 in c2.categoryChild" :key="c3.categoryId">
-                        <a :data-categoryname="c3.categoryName" :data-categoryid3="c3.categoryId">{{
-                          c3.categoryName
+        <!-- 添加过渡动画，元素或组件标签必须有 v-if 或 v-show 写了name，则以name-开头，否则v-开头-->
+        <transition name="sort">
+          <div class="sort" v-show="show">
+            <div class="all-sort-list2" @click="goSearch">
+              <div
+                class="item"
+                v-for="(c1, index) in categoryList"
+                :key="c1.categoryId"
+                :class="{ itemHover: currentIndex == index }"
+              >
+                <h3 @mouseenter="getCurrentIndex(index)">
+                  <a :data-categoryname="c1.categoryName" :data-categoryid1="c1.categoryId">{{
+                    c1.categoryName
+                  }}</a>
+                </h3>
+                <div class="item-list clearfix">
+                  <div class="subitem" v-for="c2 in c1.categoryChild" :key="c2.categoryId">
+                    <dl class="fore">
+                      <dt>
+                        <a :data-categoryname="c2.categoryName" :data-categoryid2="c2.categoryId">{{
+                          c2.categoryName
                         }}</a>
-                      </em>
-                    </dd>
-                  </dl>
+                      </dt>
+                      <dd>
+                        <em v-for="c3 in c2.categoryChild" :key="c3.categoryId">
+                          <a
+                            :data-categoryname="c3.categoryName"
+                            :data-categoryid3="c3.categoryId"
+                            >{{ c3.categoryName }}</a
+                          >
+                        </em>
+                      </dd>
+                    </dl>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </transition>
       </div>
       <nav class="nav">
         <a href="###">服装城</a>
@@ -63,10 +68,15 @@ export default {
     if (!getCategoryList()) {
       this.$store.dispatch('home/getCategoryList')
     }
+    // 如果不在 home 页面，则三级联动不显示
+    if (this.$route.path !== '/home') {
+      this.show = false
+    }
   },
   data() {
     return {
-      currentIndex: -1
+      currentIndex: -1,
+      show: true // 控制三级联动显示与隐藏
     }
   },
   computed: {
@@ -80,7 +90,7 @@ export default {
     // 获取鼠标所在标签的 index
     getCurrentIndex: throttle(function (index) {
       this.currentIndex = index
-    }, 100),
+    }, 30),
     // 跳转到 search 页
     goSearch(event) {
       // 解构，没有则为 undefined
@@ -102,7 +112,26 @@ export default {
         return
       }
       location.query = query
-      this.$router.push(location)
+      // 如果输入框也输入了值，则参数要拼接
+      if (this.$route.params) {
+        location.params = this.$route.params
+        this.$router.push(location)
+      } else {
+        this.$router.push(location)
+      }
+    },
+    // 鼠标离开后，背景颜色恢复
+    notShow() {
+      this.currentIndex = -1
+      // 如果不在 /home 页面，则联动框隐藏
+      if (this.$route.path !== '/home') {
+        this.show = false
+      }
+    },
+    onShow() {
+      if (this.$route.path !== '/home') {
+        this.show = true
+      }
     }
   }
 }
@@ -232,6 +261,19 @@ export default {
           background: #ccc;
         }
       }
+    }
+
+    .sort-enter {
+      height: 0;
+    }
+    .sort-enter-active {
+      transition: height 0.5s;
+    }
+    .sort-leave-to {
+      opacity: 0;
+    }
+    .sort-leave-active {
+      transition: opacity 0.5s;
     }
   }
 }

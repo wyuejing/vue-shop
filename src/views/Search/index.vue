@@ -1,5 +1,7 @@
 <template>
-  <div class="search">搜索</div>
+  <div class="search">
+    <type-nav></type-nav>
+  </div>
 </template>
 
 <script>

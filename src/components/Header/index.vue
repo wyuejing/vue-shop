@@ -56,13 +56,18 @@ export default {
     }
   },
   methods: {
-    // 跳转到搜索页
+    // 跳转到搜索页 如果当前页有query参数，则需要拼接
     goSearch() {
-      this.$router.push({
+      const location = {
         name: 'search',
-        params: { keywords: this.keywords || undefined },
-        query: { key: 'value' }
-      })
+        params: { keywords: this.keywords || undefined }
+      }
+      if (this.$route.query) {
+        location.query = this.$route.query
+        this.$router.push(location)
+      } else {
+        this.$router.push(location)
+      }
     }
   }
 }

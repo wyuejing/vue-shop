@@ -108,6 +108,24 @@ VueRouter.prototype.push = function (location, resolve, reject) {
 >
 > ​	**event.target.dataset**
 
+### 6.路由参数合并
+
+​	在三级联动中，点击后页面跳转，只有 query 参数，而此时再点击搜索按钮，就变成了只有 params 参数，如果在点击了三级联动，跳转页面后，还在搜索框中输入内容，进行搜索，需要将参数合并在一起。
+
+```js
+// 页面跳转后，组件其实都是重新渲染过的，只是路由参数对象存了跳转时的参数，所以判断一下是否存在即可
+const location = {
+    name: 'search',
+    params: { keywords: this.keywords || undefined }
+}
+if (this.$route.query) {
+    location.query = this.$route.query
+    this.$router.push(location)
+} else {
+	this.$router.push(location)
+}
+```
+
 
 
 ## 网络请求部分
@@ -182,9 +200,9 @@ computed: {
 
 ### 原版存在一些问题
 
-​	进行页面跳转时，三级联动组件会销毁，然后再次跳转回来时，又再次调用了actions中请求数据的函数，相当于没有进行状态管理，然后 vuex 在页面刷新后数据就丢失了，还得重新请求。
+​	进行页面跳转时，三级联动组件会销毁，然后再次跳转回来时，又再次调用了actions中请求数据的函数，**相当于没有进行状态管理**，然后 `vuex` 在页面刷新后数据就丢失了，还得重新请求。
 
-​	解决：采用sessionStorage缓存的方式，只要页面不关闭，则只需请求一次即可
+​	解决：采用`sessionStorage`缓存的方式，只要页面不关闭，则只需请求一次即可
 
 ```js
 // utils/category.js
@@ -222,7 +240,16 @@ const mutations = {
 }
 ```
 
+​	后续视频中的处理方法
 
+```js
+// 在 app 组件的 created 生命周期中调用 actions 中的请求方法
+created() {
+      this.$store.dispatch('home/getCategoryList')
+}
+```
+
+​	em。。。就当复习`sessionStorage`缓存了。。。
 
 ## 样式处理
 
@@ -249,5 +276,29 @@ data() {return {cuttentIndex: -1}}
 ```js
 // 按需引入 减少项目体积
 import throttle from 'lodash/throttle.js'
+```
+
+## mock数据
+
+```js
+// 第一步 下载 mockjs 
+// 创建mock文件夹，配置JSON数据，在mockServe.js文件中
+// 利用mockjs来mock数据接口
+import Mock from 'mockjs'
+import banners from './banner.json'
+import floors from './floors.json'
+// 提供广告位轮播数据的接口
+Mock.mock('/mock/banners', {
+  code: 200,
+  data: banners
+})
+// 提供所有楼层数据的接口
+Mock.mock('/mock/floors', {
+  code: 200,
+  data: floors
+})
+// webpack 默认对外暴露的：图片、JSON数据格式，所以JSON文件没有暴露也可以引入
+// 在main.js中引入mockServe文件
+// 然后就按照常规操作，配置axios，封装api，调用api，存储数据，使用数据
 ```
 

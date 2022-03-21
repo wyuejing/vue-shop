@@ -6,6 +6,8 @@ import store from './store'
 import '@/assets/reset.css'
 // 引入组件注册为全局组件
 import TypeNav from '@/components/TypeNav'
+// 引入 mock
+import '@/mock/mockServe.js'
 Vue.component('type-nav', TypeNav)
 
 Vue.config.productionTip = false

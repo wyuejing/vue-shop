@@ -20,6 +20,7 @@ import Like from '@/views/Home/Like'
 import Floor from '@/views/Home/Floor'
 import Brand from '@/views/Home/Brand'
 
+import { mapState } from 'vuex'
 export default {
   components: {
     ListContainer,
@@ -28,13 +29,17 @@ export default {
     Like,
     Floor,
     Brand
-  }
-  /* beforeDestroy() {
-    console.log('beforeDestroy')
   },
-  destroyed() {
-    console.log('destroyed')
-  } */
+  created() {
+    this.$store.dispatch('home/getBannerList')
+    this.$store.dispatch('home/getFloorsList')
+  },
+  computed: {
+    ...mapState({
+      bannerList: (state) => state.home.bannerList,
+      floorsList: (state) => state.home.floorsList
+    })
+  }
 }
 </script>
 
