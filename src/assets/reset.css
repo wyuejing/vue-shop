@@ -88,6 +88,7 @@ ol {
 a {
   text-decoration: none;
   color: #666;
+  cursor: pointer;
 }
 
 /* 重置表单元素 */
@@ -125,10 +126,10 @@ hr {
 html {
   overflow-y: scroll;
 }
-
+/* 未被访问过的链接 鼠标悬浮时，颜色 */
 a:link:hover {
-  color: rgb(79, 76, 212) !important;
-  text-decoration: underline;
+  color: rgb(199, 49, 38) !important;
+  /* text-decoration: underline; */
 }
 
 /* 清除浮动 */

@@ -109,7 +109,7 @@
 export default {}
 </script>
 
-<style lang="less" scope>
+<style scoped lang="less">
 .footer {
   background-color: #eaeaea;
 
