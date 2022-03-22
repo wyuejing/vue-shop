@@ -4,6 +4,8 @@ import router from './router'
 import store from './store'
 // 引入全局样式
 import '@/assets/reset.css'
+// 引入字体图标
+import '@/assets/iconfont.css'
 // 引入 swiper 样式
 import 'swiper/css/swiper.css'
 // 引入组件注册为全局组件

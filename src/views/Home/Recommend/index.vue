@@ -67,7 +67,7 @@ export default {}
         img {
           width: 100%;
           height: 100%;
-          transition: all 400ms;
+          transition: all 0.4s;
 
           &:hover {
             opacity: 0.8;

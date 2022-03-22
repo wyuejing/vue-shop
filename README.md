@@ -360,3 +360,106 @@ watch: {
 
 ​	bug：偶尔出现 banner 无法轮播的问题，可能是因为在 app 组件中发请求，获取数据的速度非常快，在这个组件中，直接拿到了数据，所以 不会 再改变，watch 则监听不到变化，所以加上 immediate：true
 
+## 给搜索框加上模糊搜索
+
+```js
+// 引入发起 jsonp 请求的包
+import { jsonp } from 'vue-jsonp'
+// 防抖函数
+import debounce from 'lodash/debounce.js'
+// 将输入的汉字转换成拼音
+import { pinyin } from 'pinyin-pro'
+
+// 输入内容，进行模糊搜索
+getKeyWord: debounce(async function () {
+      // 获取不带声调的拼音
+      // pinyin('汉语拼音', { toneType: 'none' }); // 'han yu pin yin'
+      // 将字符串转换成拼音后去除所有空格
+      const keyWords = pinyin(this.keywords.trim(), { toneType: 'none' }).replace(/\s/g, '')
+      if (keyWords.length <= 0) {
+        this.show = false
+        this.suggestList = []
+        return 0
+      }
+      // 将原来渲染的数据清除，后续重新赋值
+      this.suggestList = []
+      this.show = false
+      if (this.cacheObj[keyWords]) {
+        this.suggestList = this.cacheObj[keyWords]
+        this.show = true
+        return 0
+      }
+      // 发起请求获取数据
+      const res = await jsonp('https://suggest.taobao.com/sug?q=' + keyWords)
+      if (res.result.length === 0) {
+        return 0
+      }
+      // 将数据存入数据列表
+      this.suggestList = res.result
+      // 存入缓存对象
+      this.cacheObj[keyWords] = res.result
+      // 显示框
+      this.show = true
+      // 如果缓存中的数据超过了10条，则自动清除
+      /* if (Object.keys(this.cacheObj).length > 10) {
+        this.cacheObj = {}
+      } */
+    }, 500)
+}
+```
+
+​	清除空格：str.trim() 清除两端空格   str.replace(/\s/g, '"")  清除字符串中所有空格
+
+​	布局遇到的问题：z-index 如果父盒子是relative 则会失效
+
+​	判断是否为空对象：
+
+```js
+let obj = {}
+console.log(Object.keys(obj).length) // 0 // 将键作为元素转换成数组，如果没有，则长度为0
+if(!Object.keys(obj).length) { ... } // 如果为空 。。。
+
+let obj1 = {}
+JSON.stringify(obj1) // '{}'
+if(JSON.stringify(obj1) === '{}') { ... } // 如果为空 。。。
+
+let obj1 = {a:1}
+JSON.stringify(obj1) // '{"a":1}' 序列化为JSON字符串
+
+let a = {}
+for(let b in a ){
+    console.log(b) // undefined   !undefined === true
+    if(!b) { ... } // 如果没有键，则判断对象为空，执行为空时需要的操作
+}
+```
+
+​	自定义防抖函数：使用的时候没想好，导致每次触发的都是新的函数，
+
+```js
+// 防抖函数
+export default function debounce(fn, wait) {
+  let timer = null
+  return function (...args) {
+    const context = this
+    if (timer) {
+      clearTimeout(timer)
+      timer = null
+    }
+    setTimeout(() => {
+      fn.apply(context, args)
+    }, wait)
+  }
+}
+
+getKeyWord: debounce(fn,wait) // 正确做法  将里层函数给了 getKeyWord，然后还保留了对 timer 的引用（闭包
+// 每次触发都是执行里层函数
+
+// getKeyWord是每次按下键盘就触发
+// 错误做法
+getKeyWord() {
+    debounce(fn,wait)// 第一次写法  防抖里面的函数直接就不执行 每次都执行外层函数，返回的函数不执行
+    debounce(fn,wait)()// 第二次写法  每次触发都重新调用这个函数，其实外层函数只能调一次，这样导致了每次触发里外函数都执行了，等于就是每次开了一个定时器，将结果延迟了，
+}
+```
+
+​	我好菜。。。。离大谱了。。。。。。

@@ -7,6 +7,7 @@
     <Like></Like>
     <Floor :floor="floor" v-for="floor in floorsList" :key="floor.id"></Floor>
     <Brand></Brand>
+    <SideBar></SideBar>
   </div>
 </template>
 
@@ -19,7 +20,8 @@ export default {
     Rank: () => import('@/views/Home/Rank'),
     Like: () => import('@/views/Home/Like'),
     Floor: () => import('@/views/Home/Floor'),
-    Brand: () => import('@/views/Home/Brand')
+    Brand: () => import('@/views/Home/Brand'),
+    SideBar: () => import('@/views/Home/SideBar')
   },
   computed: {
     ...mapState({
