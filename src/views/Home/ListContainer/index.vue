@@ -4,7 +4,7 @@
     <div class="sortList clearfix">
       <div class="center">
         <!--banner轮播-->
-        <div class="swiper-container" id="mySwiper">
+        <div class="swiper-container" ref="mySwiper">
           <div class="swiper-wrapper">
             <div class="swiper-slide" v-for="banner in bannerList" :key="banner.id">
               <img :src="banner.imgUrl" />
@@ -93,11 +93,37 @@
 
 <script>
 import { mapState } from 'vuex'
+import Swiper from 'swiper'
 export default {
   computed: {
     ...mapState({
       bannerList: (state) => state.home.bannerList
     })
+  },
+  watch: {
+    bannerList: {
+      immediate: true,
+      handler() {
+        this.$nextTick(() => {
+          const mySwiper = new Swiper(this.$refs.mySwiper, {
+            autoplay: true, // 自动播放
+            loop: true, // 循环模式选项
+            pagination: {
+              // 如果需要分页器
+              el: '.swiper-pagination',
+              // 点击圆点也可切换
+              clickable: true
+            },
+            navigation: {
+              // 如果需要前进后退按钮
+              nextEl: '.swiper-button-next',
+              prevEl: '.swiper-button-prev'
+            }
+          })
+          console.log(mySwiper)
+        })
+      }
+    }
   }
 }
 </script>

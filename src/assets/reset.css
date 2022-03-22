@@ -90,6 +90,9 @@ a {
   color: #666;
   cursor: pointer;
 }
+a:hover {
+  color: rgb(199, 49, 38) !important;
+}
 
 /* 重置表单元素 */
 legend {

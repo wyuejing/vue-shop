@@ -311,7 +311,52 @@ Mock.mock('/mock/floors', {
 
 ## swiper
 
-什么时候创建实例才能生效？
+### 1.使用
 
-​	因为数据是从服务器传回来的，而Ajax请求是异步的，所以在mounted创建实例会导致，数据还没有渲染到页面，所以轮播图没法生效
+​	引入相关包及样式	需要有结构	创建swiper实例，将结构挂载到实例上
+
+### 2.什么时候创建实例才能生效？
+
+​	因为数据是从服务器传回来的，而Ajax请求是异步的，所以在mounted创建实例会导致数据还没有渲染到页面，就把对象挂载到 swiper 实例中了，所以轮播图没法生效
+
+#### 	解决：使用 watch + nextTick 
+
+```js
+const state = {
+  bannerList: [], // 仓库中的数据一开始是空数组
+}
+<div class="swiper-slide" v-for="banner in bannerList" :key="banner.id">
+  <img :src="banner.imgUrl" />
+</div>
+computed: {
+    ...mapState({// 获取store中的数据，作为computed的依赖项，因为仓库中的数据是http请求获取的，需要消耗时间，所以一开始获取到的是空数组，页面不渲染（虽然我们可能看不到），只要数据发生改变，立马渲染DOM
+      bannerList: (state) => state.home.bannerList
+    })
+}
+// 只 使用 watch ，我们能获取到数据发生变化了，但是这时如果直接 new Swiper() ,也无法成功，因为数据更新，要渲染DOM，也是需要消耗时间的，哪怕只需要一点点时间，结构都没有，怎么轮播？
+watch: {
+    bannerList: {
+        immediate: true,
+        handler() {
+            this.$nextTick(() => {
+                var mySwiper = new Swiper ('.swiper', {
+                    loop: true, // 循环模式选项
+                    pagination: { // 如果需要分页器
+                      el: '.swiper-pagination',
+                    },
+                    navigation: { // 如果需要前进后退按钮
+                      nextEl: '.swiper-button-next',
+                      prevEl: '.swiper-button-prev',
+                    }
+                })        
+            })
+        }
+    }
+}
+// this.$nextTick:将回调延迟到【下次 DOM 更新循环之后】执行。在【修改数据之后】立即使用它，然后等待 DOM 更新。
+// 也就是说 数据返回过来了，就会立即使用它，但是它会等待 DOM 更新，更新完后，才执行回调
+// 所以使用 watch 可以监听到数据变化，nextTick 可以等待到 DOM 更新完成，有了结构，所以可以 new Swiper 了
+```
+
+​	bug：偶尔出现 banner 无法轮播的问题，可能是因为在 app 组件中发请求，获取数据的速度非常快，在这个组件中，直接拿到了数据，所以 不会 再改变，watch 则监听不到变化，所以加上 immediate：true
 

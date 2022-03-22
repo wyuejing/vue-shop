@@ -5,29 +5,26 @@
     <Recommend></Recommend>
     <Rank></Rank>
     <Like></Like>
-    <Floor></Floor>
-    <Floor></Floor>
+    <Floor :floor="floor" v-for="floor in floorsList" :key="floor.id"></Floor>
     <Brand></Brand>
   </div>
 </template>
 
 <script>
-// 引入组件
-import ListContainer from '@/views/Home/ListContainer'
-import Recommend from '@/views/Home/Recommend'
-import Rank from '@/views/Home/Rank'
-import Like from '@/views/Home/Like'
-import Floor from '@/views/Home/Floor'
-import Brand from '@/views/Home/Brand'
-
+import { mapState } from 'vuex'
 export default {
   components: {
-    ListContainer,
-    Recommend,
-    Rank,
-    Like,
-    Floor,
-    Brand
+    ListContainer: () => import('@/views/Home/ListContainer'),
+    Recommend: () => import('@/views/Home/Recommend'),
+    Rank: () => import('@/views/Home/Rank'),
+    Like: () => import('@/views/Home/Like'),
+    Floor: () => import('@/views/Home/Floor'),
+    Brand: () => import('@/views/Home/Brand')
+  },
+  computed: {
+    ...mapState({
+      floorsList: (state) => state.home.floorsList
+    })
   }
 }
 </script>

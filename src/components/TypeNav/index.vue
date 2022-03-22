@@ -171,9 +171,9 @@ export default {
     .sort {
       position: absolute;
       left: 0;
-      top: 45px;
+      top: 47px;
       width: 210px;
-      height: 461px;
+      height: 460px;
       background: #fafafa;
       z-index: 999;
 
@@ -195,7 +195,7 @@ export default {
             display: none;
             position: absolute;
             width: 734px;
-            min-height: 460px;
+            min-height: 458px;
             background: #f7f7f7;
             left: 210px;
             border: 1px solid #ddd;
@@ -224,9 +224,6 @@ export default {
                   text-align: right;
                   padding: 3px 6px 0 0;
                   font-weight: 700;
-                  a:hover {
-                    color: rgb(199, 49, 38);
-                  }
                 }
 
                 dd {
@@ -242,9 +239,6 @@ export default {
                     padding: 0 8px;
                     margin-top: 5px;
                     border-left: 1px solid #ccc;
-                    a:hover {
-                      color: rgb(199, 49, 38);
-                    }
                   }
                 }
               }
