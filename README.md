@@ -36,7 +36,7 @@ v-show="$route.meta.show"
 ​	三种方法 拼接字符串 、模板字符串 、对象
 
 ```js
-// path 可以和 params 一起使用吗？
+// path 可以和 params 一起使用吗？ 不能
 // 路由跳转传参的时候，对象的写法可以是 path | name
 // 使用name需要给对应路由加上 name 配置项，而且 path 写法 不能 和 params 参数一起使用
 
@@ -55,6 +55,7 @@ this.$router.push({name: 'search', params: {keywords: '' || undefined}, query: {
 ​	路由组件可以使用 **props** 传递参数，三种方法（使用props传，**需要在组件里进行接收**）
 
 ```js
+// 都是在路由配置项里写
 props: true // 布尔值写法
 props: { a: 1 } // 对象写法 额外给路由组件传递参数
 props: ($route) => {
@@ -118,6 +119,7 @@ const location = {
     name: 'search',
     params: { keywords: this.keywords || undefined }
 }
+// 搜索框的是 params ，所以判断是否有 query
 if (this.$route.query) {
     location.query = this.$route.query
     this.$router.push(location)
@@ -145,12 +147,12 @@ const request = axios.create({
 })
 // 请求拦截器
 request.interceptors.request.use((config) => {
-  return config
+  return config // 一定要返回，可以在返回前做一些配置
 })
 // 响应拦截器
 request.interceptors.response.use(
   (res) => {
-    return res
+    return res // 一定要返回，否则浏览器收不到响应
   },
   (err) => {
     return Promise.reject(new Error(err))
@@ -183,24 +185,24 @@ module.exports = {
 
 ### vuex
 
-分模块管理 modules
+​	分模块管理 modules
 
 ```js
-// 使用了命名空间 mapstate 需要加上 名称才可以获取state
+// 使用了命名空间 mapstate 需要加上 名称 才可以获取state
 computed: {
-    ...mapState('home', ['categoryList']), // 第一种
-    // 第二种
+    ...mapState('home', ['categoryList']), // 第一种 数组方式
+    // 第二种 对象
     ...mapState({
       categoryList: (state) => state.home.categoryList 
     }) 
 }
 ```
 
-三级联动： 注意 v-for 的位置，放错模块，数据可能会显示不出，而且不报错
+​	三级联动： 注意 v-for 的位置，放错模块，数据可能会显示不出，而且不报错
 
 ### 原版存在一些问题
 
-​	进行页面跳转时，三级联动组件会销毁，然后再次跳转回来时，又再次调用了actions中请求数据的函数，**相当于没有进行状态管理**，然后 `vuex` 在页面刷新后数据就丢失了，还得重新请求。
+​	进行页面跳转时，三级联动组件会销毁，然后再次跳转回来时，又再次调用了actions中请求数据的函数，**相当于没有进行状态管理**，而且 `vuex` 在页面刷新后数据就丢失了，还得重新请求。
 
 ​	解决：采用`sessionStorage`缓存的方式，只要页面不关闭，则只需请求一次即可
 
@@ -208,6 +210,7 @@ computed: {
 // utils/category.js
 // 存储 category 信息
 export function setCategoryList(value) {
+  // 存数组需要进行JSON序列化
   return sessionStorage.setItem('category', JSON.stringify(value))
 }
 // 获取 category 信息
@@ -267,15 +270,19 @@ data() {return {cuttentIndex: -1}}
 
 ## 处理可能出现的卡顿
 
-如果用户操作速度很快，而解析器需要事件处理逻辑，有可能出现卡顿现象
+​	如果用户操作速度很快，而解析器需要事件处理逻辑，有可能出现卡顿现象
 
-我们使用节流的方法，减少事件触发的频率
+​	我们使用节流的方法，减少事件触发的频率
 
-使用 lodash 的throttle ，有些包有对它的引用，即使我们没主动下载，它也会帮我们下载
+​	使用 lodash 的throttle ，有些包有对它的引用，即使我们没主动下载，它也会帮我们下载
 
 ```js
 // 按需引入 减少项目体积
 import throttle from 'lodash/throttle.js'
+
+getCurrentIndex: throttle(function (index) {
+	this.currentIndex = index
+}, 30),
 ```
 
 ## mock数据
@@ -298,7 +305,13 @@ Mock.mock('/mock/floors', {
   data: floors
 })
 // webpack 默认对外暴露的：图片、JSON数据格式，所以JSON文件没有暴露也可以引入
-// 在main.js中引入mockServe文件
+// 在main.js中引入mockServe文件（重要）
 // 然后就按照常规操作，配置axios，封装api，调用api，存储数据，使用数据
 ```
+
+## swiper
+
+什么时候创建实例才能生效？
+
+​	因为数据是从服务器传回来的，而Ajax请求是异步的，所以在mounted创建实例会导致，数据还没有渲染到页面，所以轮播图没法生效
 

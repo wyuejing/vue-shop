@@ -13,6 +13,10 @@ export default {
   components: {
     Header,
     Footer
+  },
+  created() {
+    this.$store.dispatch('home/getBannerList')
+    this.$store.dispatch('home/getFloorsList')
   }
 }
 </script>
