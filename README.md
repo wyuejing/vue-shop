@@ -381,9 +381,6 @@ getKeyWord: debounce(async function () {
         this.suggestList = []
         return 0
       }
-      // 将原来渲染的数据清除，后续重新赋值
-      this.suggestList = []
-      this.show = false
       if (this.cacheObj[keyWords]) {
         this.suggestList = this.cacheObj[keyWords]
         this.show = true
@@ -392,6 +389,7 @@ getKeyWord: debounce(async function () {
       // 发起请求获取数据
       const res = await jsonp('https://suggest.taobao.com/sug?q=' + keyWords)
       if (res.result.length === 0) {
+        this.show = false
         return 0
       }
       // 将数据存入数据列表
@@ -433,7 +431,9 @@ for(let b in a ){
 }
 ```
 
-​	自定义防抖函数：使用的时候没想好，导致每次触发的都是新的函数，
+### 1.自定义防抖函数使用
+
+​	使用的时候没想好，导致每次触发的都是新的函数，
 
 ```js
 // 防抖函数
@@ -463,3 +463,114 @@ getKeyWord() {
 ```
 
 ​	我好菜。。。。离大谱了。。。。。。
+
+## 在主页加上侧边栏
+
+### 1.vue默认开启了严格模式。
+
+### 2.methods 里定义的箭头函数 this 为 undefined
+
+```js
+// 把文件看成是一个函数 因为开启了严格模式，所以函数的this没有调用者的时候为 undefined
+'use strict'
+function Fn(fn) {
+    console.log(this) // undefined
+    return function () {
+      console.log(this) // undefined
+      fn.apply(this) // 箭头函数的 this 无法改变，使用了apply也还是原来的值，undefined
+    }
+}
+function test() {
+    // 箭头函数的this是其所在上下文的this
+    let fn = () => {
+      console.log(this) // undefined
+    }
+    Fn(fn)()
+}
+test() 
+```
+
+> **$refs** 要在mounted生命周期才可以使用，DOM渲染了才可以获取
+
+> 注意样式的位置，css 有**层叠性**
+
+> 注意：如果项目没有报错，又不出结果，大概率是**拼写错误**，首先进行排查，另外 this 指向不要搞错
+
+```js
+// 进行布局
+// 获取盒子顶部到页面顶部的偏移量（固定定位 scrollTop 就是它的 top 值，因为它是相对于可视区域进行定位
+// 页面被卷去的头部 window.pageYOffset 元素被卷去的头部 element.scrollTop
+// 我们先让盒子处于绝对定位，等页面卷到盒子的时候，变成固定定位，所以 scrollTop 一定要在滚动前获取
+mounted() {
+    // 获取 侧边栏到顶部的偏移量
+    this.sbOffsetTop = this.$refs.sidebar.offsetTop
+    window.addEventListener('scroll', this.handleScroll)
+},
+// 加了节流  注意不要写箭头函数
+methods: {
+    /* test: () => {
+      console.log(this) // undefined
+    }, */
+    handleScroll: throttle(function () {
+      // 页面滚动过的距离
+      const wScrollTop = window.pageYOffset
+      if (wScrollTop > this.sbOffsetTop) {
+        this.isFixed = true
+      } else {
+        this.isFixed = false
+      }
+    }, 100)
+}
+// 节流函数
+export default function throttle(fn, wait) {
+  let firstTime = Date.now()
+  return function (...args) {
+    const lastTime = Date.now()
+    const context = this
+    if (lastTime - firstTime > wait) {
+      firstTime = Date.now()
+      fn.apply(context, args)
+    }
+  }
+}
+
+```
+
+```js
+// 源码中的
+function initMethods (vm: Component) {  
+    const methods = vm.$options.methods  
+    if (methods) {    
+        for (const key in methods) {
+          //这一行是重点  把methods中的函数直接动态绑定到了vue实例vm上
+          vm[key] = methods[key] == null ? noop : bind(methods[key], vm)   
+    }
+  }
+}
+```
+
+> **总结**：生命周期中的 this 指向 vm 实例，而 methods 配置项中，是将方法动态绑定到 vm 实例上
+>
+> 箭头函数的 this 指向其定义时所处上下文的 this ，没绑定到 vm 前就确定了，无法改变指向 
+>
+> 在 vue 中，默认开启了**严格模式**
+>
+> 全局作用域下的函数（非箭头函数）中使用this，在严格模式下this指向undefined
+>
+> 箭头函数所处上下文的函数对象  this 的指向为 undefined？所以 methods 中箭头函数的 this 也为 undefined？
+
+```js
+// Window.scroll()
+// 滚动窗口至文档中的特定位置。
+window.scroll(x-coord, y-coord)
+window.scroll(options)
+// x-coord 值表示你想要置于左上角的像素点的横坐标。
+// y-coord 值表示你想要置于左上角的像素点的纵坐标。
+// options 值是一个 ScrollToOptions 字典
+window.scroll({
+  top: 0, // 指定 window 或元素 Y 轴方向滚动的像素数。
+  left: 0, // 指定 window 或元素 X 轴方向滚动的像素数。
+  behavior: 'smooth' // 指定滚动是否应该平滑进行，还是立即跳到指定位置。
+});
+```
+

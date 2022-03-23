@@ -1,9 +1,9 @@
 <template>
-  <div class="side-bar" ref="sidebar" :style="styleObject">
+  <div class="side-bar" ref="sidebar" :class="{ is_fixed: isFixed }">
     <ul>
       <li>
         <a href="javascript:void(0);">
-          <span class="active">今日推荐</span>
+          <span :class="{ active: isActive }">今日推荐</span>
           <span class="line"></span>
         </a>
       </li>
@@ -29,10 +29,10 @@
         <a href="javascript:void(0);">
           <span class="iconfont icon-customer"></span>
           <span>客服</span>
-          <span class="line"></span>
+          <span class="line cur"></span>
         </a>
       </li>
-      <li>
+      <li @click="goTop">
         <a href="javascript:void(0);">
           <span class="iconfont icon-fanhuidingbu"></span>
           <span>顶部</span>
@@ -43,35 +43,40 @@
 </template>
 
 <script>
+// 引入自定义节流函数
+import throttle from '@/utils/throttle.js'
 export default {
   data() {
     return {
-      styleObject: {
-        position: 'position',
-        top: 662 + 'px'
-      }
+      isFixed: false,
+      sbOffsetTop: 0,
+      isActive: true
     }
   },
   mounted() {
+    // 获取 侧边栏到顶部的偏移量 上边框相对于父元素上边框的距离
+    this.sbOffsetTop = this.$refs.sidebar.offsetTop
     window.addEventListener('scroll', this.handleScroll) // 监听滚动事件，然后用handleScroll这个方法进行相应的处理
   },
   methods: {
-    handleScroll() {
-      const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop // 滚动条偏移量
-      const offsetTop = this.$refs.sidebar.offsetTop // 要滚动到顶部吸附的元素的偏移量
-      console.log(scrollTop, offsetTop - 100)
-      if (scrollTop > offsetTop - 100) {
-        this.styleObject = {
-          position: 'fixed',
-          top: 200 + 'px'
-        }
-      } else if (scrollTop < offsetTop - 100) {
-        this.styleObject = {
-          position: 'position',
-          top: 662 + 'px'
-        }
+    // 滚动触发
+    handleScroll: throttle(function () {
+      // 页面滚动过的距离
+      const wScrollTop = window.scrollY
+      // console.log(wScrollTop)
+      if (wScrollTop > this.sbOffsetTop) {
+        this.isFixed = true
+      } else {
+        this.isFixed = false
       }
+    }, 100),
+    // 回到顶部
+    goTop() {
+      window.scroll({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      })
     }
   }
 }
@@ -86,6 +91,7 @@ export default {
   width: 58px;
   height: 348px;
   background-color: #f0f0f0;
+  // transition: position 1s linear;
   ul {
     width: 58px;
     height: 348px;
@@ -102,10 +108,16 @@ export default {
         text-align: center;
         .line {
           position: relative;
-          top: 8px;
+          top: 9px;
           display: block;
-          height: 1px;
+          height: 0;
+          width: 0;
+          border-left: 19px solid transparent;
+          border-right: 19px solid transparent;
           border-bottom: 1px solid #ccc;
+        }
+        .cur {
+          top: 6px;
         }
         .iconfont {
           font-size: 25px;
@@ -113,12 +125,16 @@ export default {
         .active {
           color: #e6473f;
         }
+        &:hover {
+          background-color: #ccc;
+        }
       }
     }
   }
 }
+// 一定要放在 .side-bar 的后面，因为要在符合条件时层叠掉它
 .is_fixed {
   position: fixed;
-  top: 200px;
+  top: 80px;
 }
 </style>

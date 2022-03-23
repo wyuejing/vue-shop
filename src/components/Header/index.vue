@@ -40,6 +40,8 @@
             class="input-error input-xxlarge"
             v-model="keywords"
             @keyup="getKeyWord"
+            @blur="setShow"
+            @focus="getKeyWord"
           />
           <button class="sui-btn btn-xlarge btn-danger" type="button" @click="goSearch">
             搜索
@@ -97,9 +99,6 @@ export default {
         this.suggestList = []
         return 0
       }
-      // 将原来渲染的数据清除，后续重新赋值
-      this.suggestList = []
-      this.show = false
       if (this.cacheObj[keyWords]) {
         this.suggestList = this.cacheObj[keyWords]
         this.show = true
@@ -108,6 +107,7 @@ export default {
       // 发起请求获取数据
       const res = await jsonp('https://suggest.taobao.com/sug?q=' + keyWords)
       if (res.result.length === 0) {
+        this.show = false
         return 0
       }
       // 将数据存入数据列表
@@ -116,11 +116,12 @@ export default {
       this.cacheObj[keyWords] = res.result
       // 显示框
       this.show = true
-      // 如果缓存中的数据超过了10条，则自动清除
-      /* if (Object.keys(this.cacheObj).length > 10) {
-        this.cacheObj = {}
-      } */
-    }, 500)
+    }, 500),
+    // 失去焦点，隐藏 suggest 框
+    setShow() {
+      this.show = false
+      this.suggestList = []
+    }
   }
 }
 </script>

@@ -2,10 +2,10 @@
   <div class="home">
     <type-nav></type-nav>
     <ListContainer></ListContainer>
-    <Recommend></Recommend>
-    <Rank></Rank>
-    <Like></Like>
-    <Floor :floor="floor" v-for="floor in floorsList" :key="floor.id"></Floor>
+    <Recommend ref="recommend"></Recommend>
+    <Rank ref="rank"></Rank>
+    <Like ref="like"></Like>
+    <Floor :floor="floor" v-for="floor in floorsList" :key="floor.id" ref="floor"></Floor>
     <Brand></Brand>
     <SideBar></SideBar>
   </div>
