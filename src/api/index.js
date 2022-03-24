@@ -9,6 +9,15 @@ export function getBaseCategoryList() {
   })
 }
 
+// 搜索商品
+export function serachGoods(data) {
+  return request({
+    method: 'post',
+    url: '/list',
+    data
+  })
+}
+
 // 获取轮播图数据
 export function getBannerList() {
   return mockRequest({

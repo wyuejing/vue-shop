@@ -15,7 +15,7 @@ const routes = [
     meta: { show: true }
   },
   {
-    path: '/search/:keywords?', // 传递 params 参数，问号表示可传可不传
+    path: '/search/:keyword?', // 传递 params 参数，问号表示可传可不传
     component: () => import('@/views/Search/index.vue'),
     meta: { show: true },
     name: 'search'

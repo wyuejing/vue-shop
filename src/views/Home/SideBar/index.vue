@@ -63,7 +63,7 @@ export default {
     handleScroll: throttle(function () {
       // 页面滚动过的距离
       const wScrollTop = window.scrollY
-      // console.log(wScrollTop)
+      // console.log(wScrollTop > this.sbOffsetTop)
       if (wScrollTop > this.sbOffsetTop) {
         this.isFixed = true
       } else {
@@ -78,6 +78,9 @@ export default {
         behavior: 'smooth'
       })
     }
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.handleScroll)
   }
 }
 </script>
@@ -91,13 +94,9 @@ export default {
   width: 58px;
   height: 348px;
   background-color: #f0f0f0;
-  // transition: position 1s linear;
+  // transition: top 5s ease;
   ul {
-    width: 58px;
-    height: 348px;
     li {
-      width: 58px;
-      height: 58px;
       a {
         display: block;
         width: 38px;

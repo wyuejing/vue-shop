@@ -102,11 +102,11 @@ export default {
       if (categoryname) {
         // 判断是几级标签
         if (categoryid1) {
-          query = { category1Id: categoryid1 }
+          query = { category1Id: categoryid1, categoryName: categoryname }
         } else if (categoryid2) {
-          query = { category2Id: categoryid2 }
+          query = { category2Id: categoryid2, categoryName: categoryname }
         } else {
-          query = { category3Id: categoryid3 }
+          query = { category3Id: categoryid3, categoryName: categoryname }
         }
       } else {
         return
@@ -119,6 +119,7 @@ export default {
       } else {
         this.$router.push(location)
       }
+      this.show = false
     },
     // 鼠标离开后，背景颜色恢复
     notShow() {

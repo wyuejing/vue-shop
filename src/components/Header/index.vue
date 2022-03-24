@@ -38,18 +38,24 @@
             autocomplete="off"
             id="autocomplete"
             class="input-error input-xxlarge"
-            v-model="keywords"
-            @keyup="getKeyWord"
+            v-model="keyword"
+            @keyup="getWordOrGoSearch"
             @blur="setShow"
             @focus="getKeyWord"
           />
+          <input type="text" style="display: none" />
           <button class="sui-btn btn-xlarge btn-danger" type="button" @click="goSearch">
             搜索
           </button>
         </form>
       </div>
       <div class="suggest-list" v-show="show">
-        <div class="suggest-item" v-for="item in suggestList" :key="item[1]">
+        <div
+          class="suggest-item"
+          v-for="item in suggestList"
+          :key="item[1]"
+          @click="setKeywords(item[0])"
+        >
           {{ item[0] }}
         </div>
       </div>
@@ -68,19 +74,36 @@ import { pinyin } from 'pinyin-pro'
 export default {
   data() {
     return {
-      keywords: '',
+      keyword: '',
       show: false, // 控制模糊搜索框显示与隐藏
       cacheObj: {}, // 定义一个缓存对象
       suggestList: [] // 搜索到的数据
     }
   },
+  mounted() {
+    // 因为代码编写的原因，每次发起请求都相当于重新渲染了页面，所以在这里可以接收到Search传过来的事件
+    this.$bus.$on('clearKeyWord', () => {
+      this.keyword = ''
+    })
+  },
   methods: {
+    // 如果按下回车则 跳转页面，如果是其他键则进行内容匹配
+    getWordOrGoSearch: debounce(function (e) {
+      if (e.keyCode === 13) {
+        this.goSearch()
+        this.show = false
+        this.suggestList = []
+      } else {
+        this.getKeyWord()
+      }
+    }, 400),
     // 跳转到搜索页 如果当前页有query参数，则需要拼接
     goSearch() {
       const location = {
         name: 'search',
-        params: { keywords: this.keywords || undefined }
+        params: { keyword: this.keyword || undefined }
       }
+      // 如果有 query，就全部拼接在一起，这样路由参数对象就都可以获取到了
       if (this.$route.query) {
         location.query = this.$route.query
         this.$router.push(location)
@@ -88,12 +111,12 @@ export default {
         this.$router.push(location)
       }
     },
-    // 输入内容，进行模糊搜索
-    getKeyWord: debounce(async function () {
+    // 输入内容，进行内容匹配
+    async getKeyWord() {
       // 获取不带声调的拼音
       // pinyin('汉语拼音', { toneType: 'none' }); // 'han yu pin yin'
       // 将字符串转换成拼音后去除所有空格
-      const keyWords = pinyin(this.keywords.trim(), { toneType: 'none' }).replace(/\s/g, '')
+      const keyWords = pinyin(this.keyword.trim(), { toneType: 'none' }).replace(/\s/g, '')
       if (keyWords.length <= 0) {
         this.show = false
         this.suggestList = []
@@ -116,11 +139,18 @@ export default {
       this.cacheObj[keyWords] = res.result
       // 显示框
       this.show = true
-    }, 500),
-    // 失去焦点，隐藏 suggest 框
+    },
+    // 失去焦点，隐藏 suggest 框 点击按钮实际上input也会失去焦点，所以都可以实现隐藏
     setShow() {
+      setTimeout(() => {
+        this.show = false
+      }, 300)
+    },
+    // 点击提示框中的项，会获取里面的字符串进行请求及跳转页面
+    setKeywords(val) {
+      this.keyword = val
       this.show = false
-      this.suggestList = []
+      this.goSearch()
     }
   }
 }

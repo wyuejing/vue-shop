@@ -471,7 +471,7 @@ getKeyWord() {
 ### 2.methods 里定义的箭头函数 this 为 undefined
 
 ```js
-// 把文件看成是一个函数 因为开启了严格模式，所以函数的this没有调用者的时候为 undefined
+// 把vue文件看成是一个函数 因为开启了严格模式，所以函数的this没有调用者的时候为 undefined
 'use strict'
 function Fn(fn) {
     console.log(this) // undefined
@@ -506,6 +506,9 @@ mounted() {
     this.sbOffsetTop = this.$refs.sidebar.offsetTop
     window.addEventListener('scroll', this.handleScroll)
 },
+beforeDestroy() { // 记得移除事件监听，不然点击后退按钮的时候，函数无法生效
+	window.removeEventListener('scroll', this.handleScroll)
+}
 // 加了节流  注意不要写箭头函数
 methods: {
     /* test: () => {

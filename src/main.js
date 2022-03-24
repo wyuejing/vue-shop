@@ -18,6 +18,10 @@ Vue.component('type-nav', TypeNav)
 Vue.config.productionTip = false
 
 new Vue({
+  // 配置全局时间总线
+  beforeCreate() {
+    Vue.prototype.$bus = this
+  },
   router,
   store,
   render: (h) => h(App)
