@@ -190,6 +190,9 @@ export default {
 
             a {
               color: #333;
+              &:hover {
+                color: rgb(199, 49, 38);
+              }
             }
           }
           .item-list {

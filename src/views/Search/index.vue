@@ -12,45 +12,65 @@
             </li>
           </ul>
           <ul class="fl sui-tag">
+            <!-- 分类名面包屑 -->
             <li class="with-x" v-if="searchParams.categoryName">
               {{ searchParams.categoryName
               }}<i class="iconfont icon-chahao" @click="removeSateGoryName"></i>
             </li>
+            <!-- 关键词面包屑 -->
             <li class="with-x" v-if="searchParams.keyword">
               {{ searchParams.keyword }}<i class="iconfont icon-chahao" @click="removekeyword"></i>
             </li>
+            <!-- 品牌面包屑 -->
             <li class="with-x" v-if="searchParams.trademark">
               {{ searchParams.trademark.split(':')[1]
               }}<i class="iconfont icon-chahao" @click="removeTradeMark"></i>
+            </li>
+            <!-- // 属性面包屑 -->
+            <li class="with-x" v-for="(prop, index) in searchParams.props" :key="index">
+              {{ prop.split(':')[1]
+              }}<i class="iconfont icon-chahao" @click="removeAttrValue(index)"></i>
             </li>
           </ul>
         </div>
 
         <!--selector-->
-        <SearchSelector @setTradeMarkBread="tradeMarkInfo" />
+        <SearchSelector @setTradeMarkBread="tradeMarkInfo" @setattrValueBread="attrValueInfo" />
 
         <!--details-->
         <div class="details clearfix" v-if="show">
           <div class="sui-navbar">
             <div class="navbar-inner filter">
               <ul class="sui-nav">
-                <li class="active">
-                  <a href="#">综合</a>
+                <li :class="{ active: isOne }">
+                  <a href="javascript:void(0);" @click="setOrder('1')"
+                    >综合<i
+                      v-show="isOne"
+                      class="iconfont"
+                      :class="isOneUp ? 'icon-arrow-up' : 'icon-arrow-down'"
+                    ></i
+                  ></a>
+                </li>
+                <li :class="{ active: isTwo }">
+                  <a href="javascript:void(0);" @click="setOrder('2')"
+                    >销量<i
+                      v-show="isTwo"
+                      class="iconfont"
+                      :class="isTwoUp ? 'icon-arrow-up' : 'icon-arrow-down'"
+                    ></i
+                  ></a>
                 </li>
                 <li>
-                  <a href="#">销量</a>
+                  <a href="javascript:void(0);">新品</a>
                 </li>
                 <li>
-                  <a href="#">新品</a>
+                  <a href="javascript:void(0);">评价</a>
                 </li>
                 <li>
-                  <a href="#">评价</a>
+                  <a href="javascript:void(0);">价格⬆</a>
                 </li>
                 <li>
-                  <a href="#">价格⬆</a>
-                </li>
-                <li>
-                  <a href="#">价格⬇</a>
+                  <a href="javascript:void(0);">价格⬇</a>
                 </li>
               </ul>
             </div>
@@ -87,37 +107,14 @@
               </li>
             </ul>
           </div>
-          <div class="fr page">
-            <div class="sui-pagination clearfix">
-              <ul>
-                <li class="prev disabled">
-                  <a href="#"><i class="iconfont icon-xiangzuojiantou"></i>上一页</a>
-                </li>
-                <li class="active">
-                  <a href="#">1</a>
-                </li>
-                <li>
-                  <a href="#">2</a>
-                </li>
-                <li>
-                  <a href="#">3</a>
-                </li>
-                <li>
-                  <a href="#">4</a>
-                </li>
-                <li>
-                  <a href="#">5</a>
-                </li>
-                <li class="dotted"><span>...</span></li>
-                <li class="next">
-                  <a href="#">下一页<i class="iconfont icon-xiangyoujiantou"></i></a>
-                </li>
-                <li class="sum">
-                  <span>共10页&nbsp;</span>
-                </li>
-              </ul>
-            </div>
-          </div>
+          <!-- 当前页pageNum，每页条数pageSize，总条数total，连续页数continues -->
+          <page-nav
+            :pageNum="searchParams.pageNo"
+            :pageSize="searchParams.pageSize"
+            :total="total"
+            :continues="5"
+            @setPageNum="setPageNum"
+          ></page-nav>
         </div>
         <div class="notshop" v-else><h1>暂无此商品...</h1></div>
       </div>
@@ -127,7 +124,7 @@
 
 <script>
 import SearchSelector from './SearchSelector/SearchSelector'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 export default {
   name: 'Search',
   data() {
@@ -138,7 +135,7 @@ export default {
         category3Id: '',
         categoryName: '',
         keyword: '',
-        order: '',
+        order: '1:desc',
         pageNo: 1,
         pageSize: 10,
         props: [],
@@ -190,6 +187,38 @@ export default {
     removeTradeMark() {
       this.searchParams.trademark = undefined
       this.getData()
+    },
+    // 将商品属性获取过来
+    attrValueInfo(attrs, attrValue) {
+      const props = `${attrs.attrId}:${attrValue}:${attrs.attrName}`
+      // 如果存在了，就不再添加
+      if (this.searchParams.props.indexOf(props) === -1) {
+        this.searchParams.props.push(props)
+      }
+      this.getData()
+    },
+    // 通过数组下标 删除 属性 面包屑
+    removeAttrValue(index) {
+      this.searchParams.props.splice(index, 1)
+      this.getData()
+    },
+    // 设置 排序方法
+    setOrder(flag) {
+      // 拿到初始order值
+      const [count, mode] = this.searchParams.order.split(':')
+      // 如果为同一项，就改排序方式
+      if (flag === count) {
+        this.searchParams.order = mode === 'desc' ? `${count}:asc` : `${count}:desc`
+      } else {
+        this.searchParams.order = `${flag}:desc`
+      }
+      this.getData()
+    },
+    // 设置当前页数
+    setPageNum(page) {
+      this.searchParams.pageNo = page
+      // 重置页数后重新发起请求
+      this.getData()
     }
   },
   beforeMount() {
@@ -218,7 +247,25 @@ export default {
   },
   computed: {
     // 请求完成后数据就会发生改变，以store中的数据作为依赖项，可以实时获取数据
-    ...mapGetters('search', ['goodsList'])
+    ...mapGetters('search', ['goodsList']),
+    ...mapState('search', ['serachList']),
+    // 计算是按照哪个排序
+    isOne() {
+      return this.searchParams.order.indexOf('1') !== -1
+    },
+    isTwo() {
+      return this.searchParams.order.indexOf('2') !== -1
+    },
+    isOneUp() {
+      return this.searchParams.order.indexOf('asc') !== -1
+    },
+    isTwoUp() {
+      return this.searchParams.order.indexOf('asc') !== -1
+    },
+    // 获取商品总数
+    total() {
+      return this.serachList.total
+    }
   }
 }
 </script>
@@ -459,85 +506,6 @@ export default {
           }
         }
       }
-
-      .page {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 1200px;
-        height: 66px;
-
-        .sui-pagination {
-          ul {
-            li {
-              display: inline-block;
-              margin-left: -1px;
-              a {
-                padding: 9px 18px;
-                background-color: #fff;
-                border: 1px solid #e0e9ee;
-                font-size: 14px;
-                color: #333;
-              }
-
-              &.active {
-                a {
-                  background-color: #fff;
-                  color: #e1251b;
-                  border: 1px solid #f35f58;
-                  cursor: default;
-                  // margin-right: 1px;
-                  position: relative;
-                  z-index: 999;
-                }
-              }
-
-              &.prev {
-                a {
-                  background-color: #fafafa;
-                }
-              }
-
-              &.disabled {
-                a {
-                  color: #999 !important;
-                  cursor: default;
-                }
-              }
-
-              &.dotted {
-                span {
-                  padding: 9px 18px;
-                  background-color: #fff;
-                  font-size: 14px;
-                  border: 1px solid #e0e9ee;
-                  color: #333;
-                }
-              }
-
-              &.next {
-                a {
-                  background-color: #fafafa;
-                }
-                .iconfont {
-                  display: inline-block;
-                  // padding: 8px 5px 0 5px;
-                }
-              }
-
-              &.sum {
-                span {
-                  padding: 9px 18px;
-                  font-size: 14px;
-                  border: 1px solid #e0e9ee;
-                  color: #333;
-                  background-color: #fff;
-                }
-              }
-            }
-          }
-        }
-      }
     }
   }
 }
@@ -551,5 +519,8 @@ export default {
   color: red;
   border: 1px solid #ccc;
   box-sizing: border-box;
+}
+.sui-nav li a:hover {
+  color: #fff;
 }
 </style>

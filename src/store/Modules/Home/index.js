@@ -30,7 +30,9 @@ const actions = {
     // 调用接口，获取分类列表数据
     const { data: res } = await getBaseCategoryList()
     // res 数据过多，截取部分
-    res.splice(-4)
+    if (res.length > 15) {
+      res.splice(15)
+    }
     // 把数据传给mutations里的方法，进而控制state中的数据
     commit('SETCATEGORYLIST', res)
   },

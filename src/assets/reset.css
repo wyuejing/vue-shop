@@ -91,7 +91,7 @@ a {
   cursor: pointer;
 }
 a:hover {
-  color: rgb(199, 49, 38) !important;
+  color: rgb(199, 49, 38);
 }
 
 /* 重置表单元素 */
@@ -131,7 +131,7 @@ html {
 }
 /* 未被访问过的链接 鼠标悬浮时，颜色 */
 a:link:hover {
-  color: rgb(199, 49, 38) !important;
+  color: rgb(199, 49, 38);
   /* text-decoration: underline; */
 }
 

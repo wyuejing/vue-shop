@@ -10,10 +10,12 @@ import '@/assets/iconfont.css'
 import 'swiper/css/swiper.css'
 // 引入组件注册为全局组件
 import TypeNav from '@/components/TypeNav'
+import Pagination from '@/components/Pagination'
 // 引入 mock
 import '@/mock/mockServe.js'
 
 Vue.component('type-nav', TypeNav)
+Vue.component('page-nav', Pagination)
 
 Vue.config.productionTip = false
 

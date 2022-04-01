@@ -22,7 +22,11 @@
       <div class="fl key">{{ attrs.attrName }}</div>
       <div class="fl value">
         <ul class="type-list">
-          <li v-for="(item, index) in attrs.attrValueList" :key="index">
+          <li
+            v-for="(item, index) in attrs.attrValueList"
+            :key="index"
+            @click="attrValueListHandler(attrs, item)"
+          >
             <a>{{ item }}</a>
           </li>
         </ul>
@@ -43,6 +47,11 @@ export default {
     // 点击品牌，获取品牌名，加入到面包屑中，然后发起请求
     tradeMarkHandller(trademark) {
       this.$emit('setTradeMarkBread', trademark)
+    },
+    // 点击 将属性值 传给 父组件
+    attrValueListHandler(attrs, attrValue) {
+      // console.log(attrs, index)
+      this.$emit('setattrValueBread', attrs, attrValue)
     }
   }
 }

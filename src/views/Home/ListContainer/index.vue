@@ -120,7 +120,8 @@ export default {
               prevEl: '.swiper-button-prev'
             }
           })
-          console.log(mySwiper)
+          // console.log(mySwiper)
+          return mySwiper
         })
       }
     }
