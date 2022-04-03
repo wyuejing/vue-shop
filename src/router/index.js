@@ -29,11 +29,19 @@ const routes = [
     path: '/register',
     component: () => import('@/views/Register/index.vue'),
     meta: { show: false }
+  },
+  {
+    path: '/detail/:id',
+    component: () => import('@/views/Detail/index.vue'),
+    meta: { show: true }
   }
 ]
 
 const router = new VueRouter({
-  routes
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    return { y: 0 }
+  }
 })
 
 export default router

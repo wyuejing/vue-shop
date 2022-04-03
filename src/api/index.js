@@ -33,3 +33,11 @@ export function getFloorsList() {
     method: 'get'
   })
 }
+
+// 获取商品详情
+export function getGoodDetail(skuId) {
+  return request({
+    method: 'get',
+    url: `/item/${skuId}`
+  })
+}
