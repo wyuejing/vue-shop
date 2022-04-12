@@ -3,6 +3,8 @@ import axios from 'axios'
 import nprogress from 'nprogress'
 // 引入进度条样式
 import 'nprogress/nprogress.css'
+// 引入UUID
+import { getUUID } from './uuid_token.js'
 
 // 创建 axios 实例
 const request = axios.create({
@@ -13,6 +15,8 @@ const request = axios.create({
 })
 // 请求拦截器
 request.interceptors.request.use((config) => {
+  // 添加游客标识
+  config.headers.userTempId = getUUID()
   // 发起请求，进度条开启
   nprogress.start()
   return config

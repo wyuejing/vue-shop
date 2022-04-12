@@ -87,7 +87,7 @@
                 >
               </div>
               <div class="add">
-                <a href="javascript:">加入购物车</a>
+                <a @click="addToCart">加入购物车</a>
               </div>
             </div>
           </div>
@@ -329,6 +329,7 @@
 import ImageList from './ImageList/ImageList'
 import Zoom from './Zoom/Zoom'
 import { mapGetters } from 'vuex'
+import { addToCart } from '@/api'
 
 export default {
   name: 'Detail',
@@ -360,6 +361,19 @@ export default {
         this.stuNum = 1
       } else {
         this.stuNum = parseInt(value)
+      }
+    },
+    // 将产品加入购物车
+    async addToCart() {
+      // 调用api
+      const res = await addToCart(this.$route.params.id, this.stuNum)
+      if (res.code === 200) {
+        // 将产品参数传入购物车组件
+        sessionStorage.setItem('SKUINFO', JSON.stringify(this.skuInfo))
+        // 加入成功，进行路由跳转
+        this.$router.push({ name: 'addcartsuccess', query: { skuNum: this.stuNum } })
+      } else {
+        alert(res.code)
       }
     }
   }

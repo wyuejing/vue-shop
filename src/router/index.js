@@ -15,6 +15,18 @@ const routes = [
     meta: { show: true }
   },
   {
+    path: '/addcartsuccess',
+    name: 'addcartsuccess',
+    component: () => import('@/views/AddCartSuccess/index.vue'),
+    meta: { show: true }
+  },
+  {
+    path: '/shopcart',
+    name: 'shopcart',
+    component: () => import('@/views/ShopCart/index.vue'),
+    meta: { show: true }
+  },
+  {
     path: '/search/:keyword?', // 传递 params 参数，问号表示可传可不传
     component: () => import('@/views/Search/index.vue'),
     meta: { show: true },
