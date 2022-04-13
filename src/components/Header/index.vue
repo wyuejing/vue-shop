@@ -101,8 +101,12 @@ export default {
       const res = await logOut()
       if (res.code === 200) {
         localStorage.removeItem('TOKEN')
-        this.$store.dispatch('home/getUserLoginInfo')
-        this.$router.push('/home')
+        try {
+          await this.$store.dispatch('home/getUserLoginInfo')
+          this.$router.push('/home')
+        } catch (e) {
+          // console.log(e)
+        }
       }
     },
     // 如果按下回车则 跳转页面，如果是其他键则进行内容匹配

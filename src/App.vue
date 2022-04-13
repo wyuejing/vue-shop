@@ -18,6 +18,12 @@ export default {
     this.$store.dispatch('home/getBannerList')
     this.$store.dispatch('home/getFloorsList')
   }
+  /* mounted() {
+    // 在页面卸载前清除token
+    window.addEventListener('beforeunload', (e) => {
+      window.localStorage.removeItem('TOKEN')
+    })
+  } */
 }
 </script>
 

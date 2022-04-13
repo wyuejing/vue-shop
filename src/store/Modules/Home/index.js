@@ -56,7 +56,7 @@ const actions = {
       commit('SETUSERINFO', res.data)
     } else {
       commit('SETUSERINFO', {})
-      console.log('未登录')
+      return Promise.reject(new Error('未登录'))
     }
   }
 }

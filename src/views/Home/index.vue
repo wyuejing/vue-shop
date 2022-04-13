@@ -28,8 +28,10 @@ export default {
       floorsList: (state) => state.home.floorsList
     })
   },
-  mounted() {
-    this.$store.dispatch('home/getUserLoginInfo')
+  async mounted() {
+    try {
+      await this.$store.dispatch('home/getUserLoginInfo')
+    } catch (e) {}
   }
 }
 </script>
