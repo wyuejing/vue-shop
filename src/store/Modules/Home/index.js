@@ -1,12 +1,13 @@
 // 引入请求api
-import { getBaseCategoryList, getBannerList, getFloorsList } from '@/api'
+import { getBaseCategoryList, getBannerList, getFloorsList, getUserLoginInfo } from '@/api'
 // session操作
 import { setCategoryList, getCategoryList } from '@/utils/category.js'
 
 const state = {
   categoryList: getCategoryList(), // categoryList 持久化 => 放入缓存
   bannerList: [],
-  floorsList: []
+  floorsList: [],
+  userInfo: {}
 }
 const mutations = {
   // 设置分类列表数据
@@ -22,6 +23,10 @@ const mutations = {
   // 设置 floors 数据
   SETFLOORSLIST(state, floorsList) {
     state.floorsList = floorsList
+  },
+  // 存储用户信息
+  SETUSERINFO(state, info) {
+    state.userInfo = info
   }
 }
 const actions = {
@@ -43,9 +48,23 @@ const actions = {
   async getFloorsList({ commit }) {
     const { data: res } = await getFloorsList()
     commit('SETFLOORSLIST', res.data)
+  },
+  // 获取用户登录信息
+  async getUserLoginInfo({ commit }) {
+    const res = await getUserLoginInfo()
+    if (res.code === 200) {
+      commit('SETUSERINFO', res.data)
+    } else {
+      commit('SETUSERINFO', {})
+      console.log('未登录')
+    }
   }
 }
-const getters = {}
+const getters = {
+  getnickName(state) {
+    return state.userInfo.nickName || ''
+  }
+}
 
 export default {
   namespaced: true,

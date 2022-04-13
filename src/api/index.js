@@ -73,3 +73,43 @@ export function deleteGood(skuId) {
     url: `/cart/deleteCart/${skuId}`
   })
 }
+
+// 获取注册验证码
+export function getRegisterCode(phone) {
+  return request({
+    method: 'get',
+    url: `/user/passport/sendCode/${phone}`
+  })
+}
+
+// 注册用户
+export function registerUser(data) {
+  return request({
+    method: 'post',
+    url: '/user/passport/register',
+    data
+  })
+}
+
+// 登录
+export function login(data) {
+  return request({
+    method: 'post',
+    url: '/user/passport/login',
+    data
+  })
+}
+
+// 获取用户登录信息
+export function getUserLoginInfo() {
+  return request({
+    url: '/user/passport/auth/getUserInfo'
+  })
+}
+
+// 退出登录
+export function logOut() {
+  return request({
+    url: '/user/passport/logout'
+  })
+}

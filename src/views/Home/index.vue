@@ -27,6 +27,9 @@ export default {
     ...mapState({
       floorsList: (state) => state.home.floorsList
     })
+  },
+  mounted() {
+    this.$store.dispatch('home/getUserLoginInfo')
   }
 }
 </script>

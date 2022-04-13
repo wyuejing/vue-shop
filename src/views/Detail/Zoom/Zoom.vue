@@ -22,7 +22,19 @@ export default {
   },
   computed: {
     skuImageList() {
-      return this.skuInfo.skuImageList || [{}]
+      // 如果这个属性存在
+      if (this.skuInfo.skuImageList) {
+        const len = this.skuInfo.skuImageList.length
+        // 但是为空数组
+        if (len === 0) {
+          return [{}]
+        } else {
+          // 不为空
+          return this.skuInfo.skuImageList
+        }
+      }
+      // 属性不存在
+      return [{}]
     }
   },
   mounted() {

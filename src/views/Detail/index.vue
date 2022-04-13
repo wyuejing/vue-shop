@@ -7,9 +7,12 @@
     <section class="con">
       <!-- 导航路径区域 -->
       <div class="conPoin">
-        <span v-for="(item, name) in categoryView" :key="name" v-show="name.indexOf('Name') > -1">{{
-          item
-        }}</span>
+        <span
+          v-for="(item, name) in category"
+          :key="name"
+          v-show="name && name.indexOf('Name') > -1"
+          >{{ item }}</span
+        >
       </div>
       <!-- 主要内容区域 -->
       <div class="mainCon">
@@ -335,7 +338,8 @@ export default {
   name: 'Detail',
   data() {
     return {
-      stuNum: 1
+      stuNum: 1,
+      category: {}
     }
   },
   components: {
@@ -347,6 +351,14 @@ export default {
   },
   computed: {
     ...mapGetters('detail', ['categoryView', 'price', 'spuSaleAttrList', 'skuInfo'])
+  },
+  watch: {
+    categoryView(newValue) {
+      this.$nextTick(() => {
+        if (!newValue) return
+        this.category = newValue
+      })
+    }
   },
   methods: {
     setCheck(value, arr) {

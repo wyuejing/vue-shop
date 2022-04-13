@@ -118,7 +118,12 @@ export default {
     async getCartList() {
       const res = await getCartList()
       if (res.code === 200) {
-        this.cartInfoList = res.data[0].cartInfoList
+        const data = res.data[0]
+        if (!data) {
+          this.cartInfoList = []
+        } else {
+          this.cartInfoList = data.cartInfoList
+        }
       } else {
         alert(res.code)
       }
@@ -162,15 +167,12 @@ export default {
     },
     // 删除选中状态的商品
     deleteCheckedGood() {
-      const checkArr = []
+      if (this.cartInfoList.length === 0) return
       this.cartInfoList.forEach(async (item) => {
         if (item.isChecked === 1) {
-          checkArr.push(item.skuId)
+          this.deleteGoodById(item.skuId)
         }
       })
-      for (let i = 0, len = checkArr.length; i < len; i++) {
-        this.deleteGoodById(checkArr[i])
-      }
       this.getCartList()
     },
     // 选中全部商品

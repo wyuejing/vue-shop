@@ -5,6 +5,8 @@ const state = {
 }
 const mutations = {
   SETGOODDETAIL(state, goodDetailObj) {
+    // 如果获取到的数据为null,直接return出去，不然goodDetailObj变成了null，会造成一些报错
+    if (!goodDetailObj) return
     state.goodDetailObj = goodDetailObj
   }
 }

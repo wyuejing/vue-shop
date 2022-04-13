@@ -6,10 +6,14 @@
       <div class="container">
         <div class="loginList">
           <p>尚品汇欢迎您！</p>
-          <p>
+          <p v-if="!getnickName">
             <span>请</span>
             <router-link to="/login">登录</router-link>
             <router-link class="register" to="/register">免费注册</router-link>
+          </p>
+          <p v-else>
+            <span>{{ getnickName }}</span> |
+            <span @click="logOut" style="cursor: pointer">退出登录</span>
           </p>
         </div>
         <div class="typeList">
@@ -64,6 +68,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import { logOut } from '@/api'
 // 引入发起 jsonp 请求的包
 import { jsonp } from 'vue-jsonp'
 // 防抖函数
@@ -80,6 +86,9 @@ export default {
       suggestList: [] // 搜索到的数据
     }
   },
+  computed: {
+    ...mapGetters('home', ['getnickName'])
+  },
   mounted() {
     // 因为代码编写的原因，每次发起请求都相当于重新渲染了页面，所以在这里可以接收到Search传过来的事件
     this.$bus.$on('clearKeyWord', () => {
@@ -87,6 +96,15 @@ export default {
     })
   },
   methods: {
+    // 退出登录
+    async logOut() {
+      const res = await logOut()
+      if (res.code === 200) {
+        localStorage.removeItem('TOKEN')
+        this.$store.dispatch('home/getUserLoginInfo')
+        this.$router.push('/home')
+      }
+    },
     // 如果按下回车则 跳转页面，如果是其他键则进行内容匹配
     getWordOrGoSearch: debounce(function (e) {
       if (e.keyCode === 13) {

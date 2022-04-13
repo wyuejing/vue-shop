@@ -17,6 +17,11 @@ const request = axios.create({
 request.interceptors.request.use((config) => {
   // 添加游客标识
   config.headers.userTempId = getUUID()
+  // 查看有无token
+  const token = JSON.parse(localStorage.getItem('TOKEN'))
+  if (token) {
+    config.headers.token = token
+  }
   // 发起请求，进度条开启
   nprogress.start()
   return config
