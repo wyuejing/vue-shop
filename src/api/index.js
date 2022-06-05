@@ -113,3 +113,17 @@ export function logOut() {
     url: '/user/passport/logout'
   })
 }
+
+// 获取用户地址信息
+export function getAddressInfo() {
+  return request({
+    url: '/user/userAddress/auth/findUserAddressList'
+  })
+}
+
+// 获取订单交易页信息
+export function getTradeInfo() {
+  return request({
+    url: '/order/auth/trade'
+  })
+}

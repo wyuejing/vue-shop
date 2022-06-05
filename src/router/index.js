@@ -25,6 +25,12 @@ const routes = [
     meta: { show: true }
   },
   {
+    path: '/trade',
+    name: 'trade',
+    component: () => import('@/views/Trade/index.vue'),
+    meta: { show: true }
+  },
+  {
     path: '/shopcart',
     name: 'shopcart',
     component: () => import('@/views/ShopCart/index.vue'),
